@@ -1,0 +1,47 @@
+#!/bin/ksh
+
+vm=
+interface=
+ipaddress=
+netmask=
+gateway=
+while getopts i:n:a:v:g:m: name
+   do
+       case $name in
+          i)      haveinterface=1
+                  interface="$OPTARG";;
+          n)      havenetmask=1
+                  netmask="$OPTARG";;
+          a)      haveipaddr=1
+                  ipaddress="$OPTARG";;
+          v)      havevm=1
+                  vm="$OPTARG";;
+          g)      havegateway=1
+                  gateway="$OPTARG";;
+          m)      havemac=1
+                  mac="$OPTARG";;
+          ?)     printf "Usage: %s: -v VMUUID -i interfaceName -a ipaddress -n netmask [ -g gateway -m mac ] \n"  $0
+                 exit 2;;
+       esac
+   done
+   if ! [[ $haveinterface && $havenetmask && haveipaddr && havevm ]]; then
+       print "The -i -n -a -v options are required, -g and -m are optional"
+       exit 2
+       fi
+   shift $(($OPTIND - 1))
+   # $* contains rest of args
+set -x
+
+vmadm update $vm <<EOF
+{
+  "add_nics": [
+    {
+      "interface": "$interface",
+      "nic_tag": "external",
+      "ip": "$ipaddress",
+      "netmask": "$netmask",
+      "gateway": "$gateway"
+    }
+  ]
+}
+EOF

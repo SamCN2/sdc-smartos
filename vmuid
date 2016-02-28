@@ -1,0 +1,10 @@
+#!/bin/ksh
+
+vmtok=$1
+if [[ $vmtok="-*" ]]
+then
+   print usage: $0 token;  where token is a RE
+   print prints the UUID of vm where token matches in 'vmadm list'
+   exit 2
+fi
+vmadm list |nawk '$1 ~ /'$vmtok'/ || $NF ~ /'$vmtok'/ { print $1 }'  

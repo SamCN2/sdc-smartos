@@ -1,0 +1,8 @@
+#!/bin/ksh
+PATH=/opt/ogt11/bin:$PATH
+set -x 
+vm=$1
+mac=$2
+vmadm update $(vmuid $vm) <<EOT
+{"remove_nics": ["$mac"]} 
+EOT
